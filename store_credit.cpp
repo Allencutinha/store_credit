@@ -2,6 +2,8 @@
 #include<fstream>
 #include<sstream>
 #include<vector>
+#include <algorithm>
+
 using namespace std;
 class Store_credit{
 public:
@@ -111,6 +113,65 @@ void displayInputs(vector<Store_credit> storeCreditSamples)
         storeCreditSamples[r].displayItems();
     }
 }
+typedef struct{
+    int index0;
+    int index1;
+}Index;
+
+void algorithm(Store_credit &storeInfo){
+    vector<int> unsortedStoreInfo(storeInfo.priceListOfItemsAvailable);
+    sort(storeInfo.priceListOfItemsAvailable.begin(), storeInfo.priceListOfItemsAvailable.end());
+    vector<int>list(storeInfo.priceListOfItemsAvailable);
+    int index0 = 0;
+    int index1 = 0;
+
+    int newIndex0 = 0;
+    int newIndex1 = 0;
+    bool solutionFound = false;
+    for(int j = 0; j < list.size()-1; j++){
+        for(int k = 1; k < list.size(); k++){
+            if(storeInfo.creditAvailable - list[j] == list[k] && j != k){
+                index0 = j;
+                index1 = k;
+                //cout<<j<<":"<<list[j] <<" "<<k<<":"<<list[k] << " "<<storeInfo.creditAvailable<<endl;
+                solutionFound = true;
+                break;
+            }
+        }
+        if(solutionFound){
+            vector<int>Unsortedlist(unsortedStoreInfo);
+            int match1 = 0;
+            for(int x = 0; x < list.size();x++){
+                //cout<<unsortedStoreInfo[x]<< " ";
+                if(list[index0] == Unsortedlist[x] && !match1){
+                    newIndex0 = x;
+                    match1 = x;
+                }
+                if(list[index1] == Unsortedlist[x] && match1 !=x){
+                    newIndex1 = x;
+                }
+            }
+            cout<<endl;
+            break;
+        }
+    }
+    index0 = newIndex0;
+    index1 = newIndex1;
+#if 1
+    if(index0 < index1){
+        cout<< index0+1<<" ";
+        cout<< index1+1<<endl;
+        cout<<unsortedStoreInfo[index0] << "+" <<unsortedStoreInfo[index1]<< " = "<< storeInfo.creditAvailable<<endl;
+    }
+    else{
+        cout<<index1+1<<" ";
+        cout<<index0+1<<endl;
+        cout<<unsortedStoreInfo[index0] << "+" <<unsortedStoreInfo[index1]<< " = "<< storeInfo.creditAvailable<<endl;
+    }
+
+#endif
+}
+
 int main(int argc, char* argv[])
 {
     cout<<"_____________Code Jam:: Store Credit____________"<<endl;
@@ -120,8 +181,82 @@ int main(int argc, char* argv[])
         cout<<"\tinputs could not be loaded sucessfully!!!"<<endl;
         return 0;
     }
-
     displayInputs(storeCreditSamples);
 
+   for (int i = 0; i < storeCreditSamples.size();i++){
+       cout<<"Case #"<<i<<": ";
+       algorithm(storeCreditSamples[i]);
+   }
+#if 0
+    vector<Index> ListOfIndices(storeCreditSamples.size());
+    vector<Index> ListOfMatchinIndicesInUnsortedItrmList(storeCreditSamples.size());
+    vector<Store_credit> UnsortedstoreCreditSamples(storeCreditSamples);
+    for (int i = 0; i < storeCreditSamples.size();i++){
+        sort(storeCreditSamples[i].priceListOfItemsAvailable.begin(),
+             storeCreditSamples[i].priceListOfItemsAvailable.end());
+        int creditAvailable = storeCreditSamples[i].creditAvailable;
+        int numberOfItems   = storeCreditSamples[i].numberOfItemsAvailable;
+        bool solutionFound = false;
+        vector<int>list(storeCreditSamples[i].priceListOfItemsAvailable);
+        for(int j = 0; j < list.size()-1; j++){
+            for(int k = 1; k < list.size(); k++){
+                //if(list[j])
+                if(creditAvailable - list[j] == list[k] && j != k){
+                    ListOfIndices[i].index0 = j;
+                    ListOfIndices[i].index1 = k;
+                    cout<<j<<" "<<k<<endl;
+                    solutionFound = true;
+                    break;
+                }
+            }
+            if(solutionFound){
+                vector<int>Unsortedlist(UnsortedstoreCreditSamples[i].priceListOfItemsAvailable);
+                int match1 = 0;
+                for(int x = 0; x < list.size();x++){
+                    if(list[ListOfIndices[i].index0] == Unsortedlist[x] && !match1){
+                        ListOfMatchinIndicesInUnsortedItrmList[i].index0 = x;
+                        match1 = x;
+                    }
+                    if(list[ListOfIndices[i].index1] == Unsortedlist[x] && match1 != x){
+                        ListOfMatchinIndicesInUnsortedItrmList[i].index1 = x;
+                    }
+                }
+                break;
+            }
+        }
+    }
+    for (int i = 0; i < storeCreditSamples.size();i++){
+        cout<<storeCreditSamples[i].creditAvailable<<endl;
+        cout<<ListOfMatchinIndicesInUnsortedItrmList[i].index0+1<<" : ";
+        cout<<storeCreditSamples[i].priceListOfItemsAvailable[ListOfIndices[i].index0]<<" ";
+         cout<<ListOfMatchinIndicesInUnsortedItrmList[i].index1+1<<" : ";
+        cout<<storeCreditSamples[i].priceListOfItemsAvailable[ListOfIndices[i].index1]<<endl;
+    }
+
+    for (int i = 0; i < storeCreditSamples.size();i++){
+        cout<<UnsortedstoreCreditSamples[i].creditAvailable<<endl;
+
+        cout<<ListOfMatchinIndicesInUnsortedItrmList[i].index0+1<<" : ";
+        cout<<UnsortedstoreCreditSamples[i].priceListOfItemsAvailable[ListOfMatchinIndicesInUnsortedItrmList[i].index0]<<" ";
+
+
+        cout<<ListOfMatchinIndicesInUnsortedItrmList[i].index1+1<<" : ";
+        cout<<UnsortedstoreCreditSamples[i].priceListOfItemsAvailable[ListOfMatchinIndicesInUnsortedItrmList[i].index1]<<endl;
+    }
+
+    for (int i = 0; i < storeCreditSamples.size();i++){
+        cout<<"Case #"<<i<<": ";
+        if(ListOfMatchinIndicesInUnsortedItrmList[i].index0 < ListOfMatchinIndicesInUnsortedItrmList[i].index1){
+            cout<<ListOfMatchinIndicesInUnsortedItrmList[i].index0+1<<" ";
+            cout<<ListOfMatchinIndicesInUnsortedItrmList[i].index1+1<<endl;
+        }
+        else{
+            cout<<ListOfMatchinIndicesInUnsortedItrmList[i].index1+1<<" ";
+            cout<<ListOfMatchinIndicesInUnsortedItrmList[i].index0+1<<endl;
+        }
+    }
+
+    displayInputs(UnsortedstoreCreditSamples);
+#endif
     return 1;
 }
