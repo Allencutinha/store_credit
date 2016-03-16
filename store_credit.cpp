@@ -9,8 +9,8 @@ using namespace std;
 int main(int argc , char * argv[]){
     ifstream inFile(argv[1]);
     ofstream outFile(argv[2]);
-    if(!inFile){return -1;}
-    if(!outFile){return -1;}
+    if(!inFile){cout<<"input file name needed!!"<<endl;return -1;}
+    if(!outFile){cout<<"output file name needed!!"<<endl;return -1;}
 
     int cases, caseIterator = 0, credit, noOfItems;
     inFile >> cases;
